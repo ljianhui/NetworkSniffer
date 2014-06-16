@@ -1,8 +1,9 @@
 This is a network sniffer program, such as tcpdump.
 
-program name: netsniffer
+Program name: netsniffer
 
 Development environment:
-	linux 2.6.32 + g++ 4.4.7 + libpcap
+	linux 2.6.32 + g++ 4.4.7 + raw socket 
 
+help:
 
