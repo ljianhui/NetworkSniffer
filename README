@@ -5,5 +5,43 @@ Program name: netsniffer
 Development environment:
 	linux 2.6.32 + g++ 4.4.7 + raw socket 
 
+
+Class view:
+	Analysis
+	   |
+	   |------EthernetAnalysis
+	   |
+	   |------ArpAnalysis
+	   |
+	   |------IpAnalysis
+	   |
+	   |------TcpAnalysis
+	   |
+	   |------UdpAnalysis
+	   |
+	   |------IcmpAnalysis
+
+	RowSocket
+
+Protocol Analysis tree:
+
+	EthernetAnalysis
+		/\
+	       /  \
+	      /	   \
+	     /	    \
+	    /	     \
+       ArpAnalysis  IpAnalysis
+			/|\
+		       / | \
+		      /  |  \
+		     /   |   \
+		    /    |    \
+		   /     |     \
+		  /      |      \
+		 /       |       \
+		/        |        \
+       TcpAnalysis  UdpAnalysis  IcmpAnalysis
+		
 help:
 

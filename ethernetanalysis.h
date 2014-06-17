@@ -3,15 +3,18 @@
 
 #include "analysis.h"
 
-#define MAC_LEN 6
-
 class EthernetAnalysis : public Analysis
 {
 	public:
 		EthernetAnalysis();
 		virtual ~EthernetAnalysis();
 		
+		const unsigned char* getDstAddr()const;
+		const unsigned char* getSrcAddr()const;
+		unsigned short getType()const;
+		
 		virtual void analyzeProtocol(int code);
+		virtual void printResult();
 	private:
 		unsigned char _dst[MAC_LEN];
 		unsigned char _src[MAC_LEN];
