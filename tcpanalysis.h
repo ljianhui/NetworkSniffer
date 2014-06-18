@@ -16,9 +16,10 @@ class TcpAnalysis : public Analysis
 		unsigned char getHeaderLen()const;
 		unsigned short getWindow()const;
 		unsigned short getCheckSum()const;
-		bool hasAckFlag()const;
-		bool hasSynFlag()const;
-		bool hasFinFlag()const;
+		size_t hasAckFlag()const;
+		size_t hasSynFlag()const;
+		size_t hasFinFlag()const;
+		size_t hasRstFlag()const;
 
 		virtual void analyzeProtocol(size_t *bytes = NULL);
 		virtual void printResult();

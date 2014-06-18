@@ -35,8 +35,7 @@ class Analysis
 
 	private:
 		std::list<Analysis*> _childern;
-		static char _mac_str[18];
-		static char _ip_str[16];
+		char _addr_str[18];
 };
 
 #endif

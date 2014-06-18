@@ -27,8 +27,8 @@ class IpAnalysis : public Analysis
 		unsigned char _ttl;
 		unsigned char _protocol;
 		unsigned short _check_sum;
-		unsigned char _dst[IP_LEN];
-		unsigned char _src[IP_LEN];
+		unsigned char _dst_addr[IP_LEN];
+		unsigned char _src_addr[IP_LEN];
 };
 
 #endif

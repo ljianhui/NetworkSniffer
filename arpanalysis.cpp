@@ -107,9 +107,9 @@ void ArpAnalysis::analyzeProtocol(size_t *bytes)
 void ArpAnalysis::printResult()
 {
 	printf("ARP:\n");
-	printf("\tHardware type: %d, Protocol type: %d\n",
+	printf("\tHardware type: %u, Protocol type: %u\n",
 		_hardware, _protocol);
-	printf("\tHardware addr len: %d, Protocol addr len: %d, Opcode: %d",
+	printf("\tHardware addr len: %u, Protocol addr len: %u, Opcode: %u",
 		_hdaddr_len, _praddr_len, _opt);
 	printf("\tSource MAC addr: %s, Source IP addr: %s\n", 
 		_macAddrToString(_src_hd_addr), _ipAddrToString(_src_pr_addr));

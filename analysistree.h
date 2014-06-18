@@ -2,6 +2,7 @@
 #define ANALYSISTREE_H_INCLUDE
 
 #include <vector>
+#include <string>
 
 class Analysis;
 
@@ -15,19 +16,18 @@ class AnalysisTree
 			IP = 2,
 			ICMP = 3,
 			TCP = 4,
-			IP = 5
+			UDP = 5
 		};
 	public:
 		AnalysisTree();
 		~AnalysisTree();
 
 		void buildAnalysisTree();
-		void setRoot(Root root);
-		void setBuffer(unsigned char *buffer, size_t bufsize);
-		void analyzeAndPrint();
+		void setProtocolFilter(const std::string &filter);
+		void analyzeAndPrint(unsigned char *buffer, size_t bufsize);
 	private:
 		std::vector<Analysis*> _node;
-		Analysis *_root;
+		std::string _filter;
 		unsigned char *_buffer;
 		size_t _bufsize;
 };

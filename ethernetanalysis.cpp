@@ -50,3 +50,18 @@ void EthernetAnalysis::analyzeProtocol(size_t *bytes)
 		child->analyzeprotocol(bytes);
 	}
 }
+
+void EthernetAnalysis::printResult()
+{
+	printf("Ethernet\n");
+	printf("\tDestination MAC: %s\nSource MAC: %s\n",
+		_macToString(_dst_addr), _macToString(_src_addr));
+	printf("\tType: %u\n", _type);
+
+	Analysis *child = _getChild(_type);
+	if(child != NULL)
+	{
+		child->printResult();
+	}
+}
+

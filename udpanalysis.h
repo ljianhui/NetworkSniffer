@@ -9,7 +9,7 @@ class UdpAnalysis : public Analysis
 		UdpAnalysis();
 		virtual ~UdpAnalysis();
 
-		unsigned short getSrcport()const;
+		unsigned short getSrcPort()const;
 		unsigned short getDstPort()const;
 		unsigned short getUdpLen()const;
 		unsigned short getCheckSum()const;

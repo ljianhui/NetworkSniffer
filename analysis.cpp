@@ -47,15 +47,15 @@ Analysis* Analysis::_getChild(int code)
 
 const char* _Analysis::_macAddrToString(unsigned char *macaddr)
 {
-	sprintf(_mac_str, "%x:%x:%x:%x:%x:%x", 
+	sprintf(_addr_str, "%x:%x:%x:%x:%x:%x", 
 		macaddr[0], macaddr[1], macaddr[2], 
 		macaddr[3], macaddr[4], macaddr[5]);
-	return _mac_str;
+	return _addr_str;
 }
 
 const char* _ipAddrToString(unsigned char *ipaddr)
 {
-	sprintf(_ip_str, "%d.%d.%d.%d",
+	sprintf(_addr_str, "%d.%d.%d.%d",
 		ipaddr[0], ipaddr[1], ipaddr[2], ipaddr[3]);
-	return _ip_str;
+	return _addr_str;
 }
