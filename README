@@ -22,6 +22,7 @@ Class view:
 	   |------IcmpAnalysis
 
 	RowSocket
+	AnaylsisTree
 
 Protocol Analysis tree:
 
@@ -42,6 +43,9 @@ Protocol Analysis tree:
 		 /       |       \
 		/        |        \
        TcpAnalysis  UdpAnalysis  IcmpAnalysis
+
+Core design thinking:
+	Composite patterns
 		
 help:
 

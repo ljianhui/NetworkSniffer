@@ -13,11 +13,11 @@ class EthernetAnalysis : public Analysis
 		const unsigned char* getSrcAddr()const;
 		unsigned short getType()const;
 		
-		virtual void analyzeProtocol(int code);
+		virtual void analyzeProtocol(size_t *bytes = NULL);
 		virtual void printResult();
 	private:
-		unsigned char _dst[MAC_LEN];
-		unsigned char _src[MAC_LEN];
+		unsigned char _dst_addr[MAC_LEN];
+		unsigned char _src_addr[MAC_LEN];
 		unsigned short _type;
 };
 

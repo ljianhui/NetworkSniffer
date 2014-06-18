@@ -20,7 +20,7 @@ class TcpAnalysis : public Analysis
 		bool hasSynFlag()const;
 		bool hasFinFlag()const;
 
-		virtual void analyzeprotocol(int code);
+		virtual void analyzeProtocol(size_t *bytes = NULL);
 		virtual void printResult();
 
 	private:

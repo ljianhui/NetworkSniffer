@@ -13,11 +13,7 @@ class RawSocket
 		RawSocket();
 		~RawSocket();
 
-		bool createArpSocket();
-		bool createIpSocket();
-		bool createTcpSocket();
-		bool createUdpSocket();
-		bool createIcmpSocket();
+		bool createSocket();
 
 		int recvPacket(unsigned char *buffer, size_t bufsize);
 		int bind(const char *interface);

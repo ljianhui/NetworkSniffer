@@ -9,32 +9,34 @@
 class Analysis
 {
 	public:
-		Analysis(size_t bufsize);
+		Analysis(const std::string &pname = "", int pcode = 0);
 		virtual ~Analysis();
 
 		void addChild(Analysis *child);
-		void setBuffer(char *buffer, size_t bufsize);
+		void setBuffer(unsigned char *buffer, size_t bufsize);
 		
 		std::string getProtocolName()const;
-		unsigned short getSumLength()const;
-		unsigned short getCode()const;
+		unsigned short getPCode()const;
 
-		virtual void analyzeProtocol(int code) = 0;
+		virtual void analyzeProtocol(size_t *bytes = NULL) = 0;
 		virtual void printResult() = 0;
 
 	protected://function
 		Analysis* _getChild(int code);
+		const char* _macAddrToString(const unsigned char *macaddr);
+		const char* _ipAddrToString(const unsigned char *ipaddr);
 
 	protected://data
 		unsigned char *_buffer;
 		size_t _bufsize;
 		std::string _protocol_name;
-		unsigned short _sum_len;
 
 		const unsigned short _pcode;
 
 	private:
 		std::list<Analysis*> _childern;
+		static char _mac_str[18];
+		static char _ip_str[16];
 };
 
 #endif

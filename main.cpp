@@ -99,11 +99,17 @@ int main(int argc, char **argv)
 		unsigned char *buf_begin = buffer + w_pos * col;
 		bzero(buf_begin, col);
 		rawsock.recvPacket(buf_begin, col);
-		w_pos == (row-1) ? 0:++w_pos;
+		if(++w_pos == row)
+			w_pos = 0;
 	}
 	
 	int ret = pthread_join(tid, &thread_ret);
 	
 	delete[] buffer;
 	return 0;
+}
+
+void DoBeforeExit(int sig)
+{
+	running = false;
 }

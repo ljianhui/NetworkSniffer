@@ -18,7 +18,7 @@ class IpAnalysis : public Analysis
 		unsigned char getProtocol()const;
 		unsigned short getCheckSum()const;
 
-		virtual void analyzeProcotol(int level);
+		virtual void analyzeProtocol(size_t *bytes = NULL);
 		virtual void printResult();
 	private:
 		unsigned char _version;

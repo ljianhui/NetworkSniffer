@@ -14,7 +14,7 @@ class UdpAnalysis : public Analysis
 		unsigned short getUdpLen()const;
 		unsigned short getCheckSum()const;
 
-		virtual void analyzeProtocol(int code);
+		virtual void analyzeProtocol(size_t *bytes = NULL);
 		virtual void printResult();
 
 	private:
