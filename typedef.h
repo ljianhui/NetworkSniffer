@@ -11,5 +11,8 @@
 #define IP_LEN 4
 #define MAC_LEN 6
 
+class Analysis;
+typedef std::vector<Analysis*> ProtocolStack;
+
 #endif
 

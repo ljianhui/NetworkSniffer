@@ -3,7 +3,7 @@
 
 #include <vector>
 #include <string>
-#include "analysis.h"
+#include "typedef.h"
 
 class Analysis;
 

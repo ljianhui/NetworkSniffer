@@ -15,9 +15,9 @@ class ArpAnalysis : public Analysis
 		unsigned char getProtocolAddrLen()const;
 		unsigned short getOpt()const;
 		const unsigned char* getSrcHardwareAddr()const;
-		const unsigned char* getSrcProtocolAddr()const;
+		size_t getSrcProtocolAddr()const;
 		const unsigned char* getDstHardwareAddr()const;
-		const unsigned char* getDstProtocolAddr()const;
+		size_t getDstProtocolAddr()const;
 
 		virtual void analyzeProtocol(ProtocolStack &pstack,
 						size_t *bytes = NULL);
@@ -29,9 +29,9 @@ class ArpAnalysis : public Analysis
 		unsigned char _praddr_len;
 		unsigned short _opt;
 		unsigned char _src_hd_addr[6];
-		unsigned char _src_pr_addr[4];
+		size_t _src_pr_addr;
 		unsigned char _dst_hd_addr[6];
-		unsigned char _dst_pr_addr[4];
+		size_t _dst_pr_addr;
 };
 
 #endif

@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <strings.h>
 #include <memory.h>
+#include <netinet/in.h>
 #include "udpanalysis.h"
 
 UdpAnalysis::UdpAnalysis():
@@ -19,16 +20,16 @@ UdpAnalysis::~UdpAnalysis()
 void UdpAnalysis::analyzeProtocol(ProtocolStack &pstack, size_t *bytes)
 {
 	unsigned short *ushort_ptr = (unsigned short*)_buffer;
-	_src_port = *ushort_ptr;
+	_src_port = ntohs(*ushort_ptr);
 	++ushort_ptr;
 
-	_dst_port = *ushort_ptr;
+	_dst_port = ntohs(*ushort_ptr);
 	++ushort_ptr;
 
-	_udp_len = *ushort_ptr;
+	_udp_len = ntohs(*ushort_ptr);
 	++ushort_ptr;
 
-	_check_sum = *ushort_ptr;
+	_check_sum = ntohs(*ushort_ptr);
 	++ushort_ptr;
 
 	if(bytes != NULL)
@@ -49,7 +50,7 @@ void UdpAnalysis::printResult()
 	printf("UDP:\n");
 	printf("\tSource port: %u, Destination port: %u\n",
 		_src_port, _dst_port);
-	printf("\tUdp len: %u, Check sum: %x\n", 
+	printf("\tUdp len: %u, Check sum: 0x%x\n", 
 		_udp_len, _check_sum);
 
 	/*

@@ -65,7 +65,7 @@ int main(int argc, char **argv)
 
 	RawSocket rawsock;
 	ThreadArg thread_arg;
-	if(rawsock.createSocket())
+	if(rawsock.createSocket() == false)
 	{
 		fprintf(stderr, "create socket failed\n");
 		exit(EXIT_FAILURE);
@@ -92,24 +92,31 @@ int main(int argc, char **argv)
 	thread_arg.buf_col = col;
 	thread_arg.r_pos = &r_pos;
 	thread_arg.w_pos = &w_pos;
-
+/*
 	pthread_t tid = 0;
 	void *thread_ret = NULL;
 	tid = pthread_create(&tid, NULL, AnalysisThread, &thread_arg);
-
+*/
 	signal(SIGTERM, DoBeforeExit);
 	signal(SIGINT, DoBeforeExit);
-
+	
+	AnalysisTree analy_tree;
+	analy_tree.buildAnalysisTree();
+	analy_tree.setProtocolFilter(opts[0]);
 	while(running)
 	{
-		unsigned char *buf_begin = buffer + w_pos * col;
-		bzero(buf_begin, col);
-		rawsock.recvPacket(buf_begin, col);
+		//unsigned char *buf_begin = buffer + w_pos * col;
+		bzero(buffer, col);
+		rawsock.recvPacket(buffer, col);
+		analy_tree.analyzeAndPrint(buffer, col);
+		
+		/*
 		if(++w_pos == row)
 			w_pos = 0;
+		*/
 	}
 	
-	int ret = pthread_join(tid, &thread_ret);
+//	int ret = pthread_join(tid, &thread_ret);
 	
 	delete[] buffer;
 	return 0;
@@ -138,5 +145,5 @@ void* AnalysisThread(void *arg)
 				*(thread_arg->r_pos) = 0;
 		}
 	}
-	pthread_exit(NULL);
+//	pthread_exit(NULL);
 }

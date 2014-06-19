@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <netinet/in.h>
 #include "icmpanalysis.h"
 
 IcmpAnalysis::IcmpAnalysis():
@@ -23,7 +24,7 @@ void IcmpAnalysis::analyzeProtocol(ProtocolStack &pstack, size_t *bytes)
 	++uchar_ptr;
 
 	unsigned short *ushort_ptr = (unsigned short*)uchar_ptr;
-	_check_sum = *ushort_ptr;
+	_check_sum = ntohs(*ushort_ptr);
 	++ushort_ptr;
 
 	if(bytes != NULL)
@@ -34,7 +35,7 @@ void IcmpAnalysis::analyzeProtocol(ProtocolStack &pstack, size_t *bytes)
 void IcmpAnalysis::printResult()
 {
 	printf("ICMP:\n");
-	printf("\tType: %u, Code: %u, Check sum: %u\n",
+	printf("\tType: %u, Code: %u, Check sum: 0x%x\n",
 		_type, _code, _check_sum);
 }
 

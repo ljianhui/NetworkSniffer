@@ -54,6 +54,8 @@ void AnalysisTree::setProtocolFilter(const std::string &filter)
 
 void AnalysisTree::setProtocolFilter(const char *filter)
 {
+	if(filter == NULL)
+		return;
 	std::string tmp(filter);
 	setProtocolFilter(tmp);
 }

@@ -7,10 +7,6 @@
 #include <vector>
 #include "typedef.h"
 
-class Analysis;
-
-typedef std::vector<Analysis*> ProtocolStack;
-
 class Analysis
 {
 	public:
@@ -30,7 +26,7 @@ class Analysis
 	protected://function
 		Analysis* _getChild(int code);
 		const char* _macAddrToString(const unsigned char *macaddr);
-		const char* _ipAddrToString(const unsigned char *ipaddr);
+		const char* _ipAddrToString(size_t ipaddr);
 
 	protected://data
 		unsigned char *_buffer;

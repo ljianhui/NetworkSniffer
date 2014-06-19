@@ -11,8 +11,8 @@ class IpAnalysis : public Analysis
 
 		unsigned char getVersion()const;
 		unsigned char getHeaderLen()const;
-		const unsigned char* getDstIp()const;
-		const unsigned char* getSrcIp()const;
+		size_t getDstIp()const;
+		size_t getSrcIp()const;
 		unsigned short getIpPackageLen()const;
 		unsigned char getTTL()const;
 		unsigned char getProtocol()const;
@@ -28,8 +28,8 @@ class IpAnalysis : public Analysis
 		unsigned char _ttl;
 		unsigned char _protocol;
 		unsigned short _check_sum;
-		unsigned char _dst_addr[IP_LEN];
-		unsigned char _src_addr[IP_LEN];
+		size_t _dst_addr;
+		size_t _src_addr;
 };
 
 #endif

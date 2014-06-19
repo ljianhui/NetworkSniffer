@@ -1,7 +1,8 @@
-#include "ethernetanalysis.h"
 #include <stdio.h>
 #include <memory.h>
 #include <strings.h>
+#include <netinet/in.h>
+#include "ethernetanalysis.h"
 
 EthernetAnalysis::EthernetAnalysis():
 	Analysis("ethernet", ETHER_CODE),
@@ -43,7 +44,7 @@ void EthernetAnalysis::analyzeProtocol(ProtocolStack &pstack, size_t *bytes)
 	uchar_ptr += sizeof(_src_addr);
 
 	unsigned short *ushort_ptr = (unsigned short*)uchar_ptr;
-	_type = *ushort_ptr;
+	_type = ntohs(*ushort_ptr);
 
 	Analysis *child = _getChild(_type);
 	if(child != NULL)
@@ -55,10 +56,10 @@ void EthernetAnalysis::analyzeProtocol(ProtocolStack &pstack, size_t *bytes)
 
 void EthernetAnalysis::printResult()
 {
-	printf("Ethernet\n");
-	printf("\tDestination MAC: %s\nSource MAC: %s\n",
-		_macAddrToString(_dst_addr), _macAddrToString(_src_addr));
-	printf("\tType: %u\n", _type);
+	printf("Ethernet:\n");
+	printf("\tDestination MAC: %s\n", _macAddrToString(_dst_addr));
+	printf("\tSource MAC: %s\n", _macAddrToString(_src_addr));
+	printf("\tType: 0x%x\n", _type);
 	/*
 	Analysis *child = _getChild(_type);
 	if(child != NULL)

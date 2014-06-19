@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <memory.h>
 #include <strings.h>
+#include <netinet/in.h>
 #include "tcpanalysis.h"
 
 TcpAnalysis::TcpAnalysis():
@@ -23,22 +24,23 @@ TcpAnalysis::~TcpAnalysis()
 void TcpAnalysis::analyzeProtocol(ProtocolStack &pstack, size_t *bytes)
 {
 	unsigned short *ushort_ptr = (unsigned short*)_buffer;
-	_src_port = *ushort_ptr;
+	_src_port = ntohs(*ushort_ptr);
 	++ushort_ptr;
 
-	_dst_port = *ushort_ptr;
+	_dst_port = ntohs(*ushort_ptr);
 	++ushort_ptr;
 
 	size_t *uint_ptr = (size_t*)ushort_ptr;
-	_seq = *uint_ptr;
+	_seq = ntohl(*uint_ptr);
 	++uint_ptr;
 
-	_ack = *uint_ptr;
+	_ack = ntohl(*uint_ptr);
 	++uint_ptr;
 
 	unsigned char *uchar_ptr = (unsigned char*)uint_ptr;
 	_header_len = *uchar_ptr;
 	_header_len = _header_len >> 4;
+	_header_len *= sizeof(size_t);
 	++uchar_ptr;
 
 	_flags = *uchar_ptr;
@@ -46,10 +48,10 @@ void TcpAnalysis::analyzeProtocol(ProtocolStack &pstack, size_t *bytes)
 	++uchar_ptr;
 
 	ushort_ptr = (unsigned short*)uchar_ptr;
-	_window = *ushort_ptr;
+	_window = ntohs(*ushort_ptr);
 	++ushort_ptr;
 
-	_check_sum = *ushort_ptr;
+	_check_sum = ntohs(*ushort_ptr);
 	++ushort_ptr;
 	
 	if(bytes != NULL)
@@ -75,7 +77,7 @@ void TcpAnalysis::printResult()
 		_seq, _ack);
 	printf("\tHeader len: %u, ACK: %u, SYN: %u, FIN: %u\n",
 		_header_len, hasAckFlag(), hasSynFlag(), hasFinFlag());
-	printf("\tWindow size: %u, Check sum: %x\n",
+	printf("\tWindow size: %u, Check sum: 0x%x\n",
 		_window, _check_sum);
 
 	/*

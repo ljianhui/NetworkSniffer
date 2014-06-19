@@ -53,9 +53,11 @@ const char* Analysis::_macAddrToString(const unsigned char *macaddr)
 	return _addr_str;
 }
 
-const char* Analysis::_ipAddrToString(const unsigned char *ipaddr)
+const char* Analysis::_ipAddrToString(size_t ipaddr)
 {
-	sprintf(_addr_str, "%d.%d.%d.%d",
-		ipaddr[0], ipaddr[1], ipaddr[2], ipaddr[3]);
+	size_t *uint_ptr = &ipaddr;
+	unsigned char *pipaddr = (unsigned char*)uint_ptr;
+	sprintf(_addr_str, "%u.%u.%u.%u",
+		pipaddr[0], pipaddr[1], pipaddr[2], pipaddr[3]);
 	return _addr_str;
 }

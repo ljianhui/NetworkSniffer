@@ -42,7 +42,7 @@ udpanalysis.o: analysis.h udpanalysis.h udpanalysis.cpp
 
 analysistree.o: analysis.h ethernetanalysis.h arpanalysis.h ipanalysis.h \
                 icmpanalysis.h tcpanalysis.h udpanalysis.h analysistree.h \
-		analysistree.cpp
+		typedef.h analysistree.cpp
 	$(CC) -c analysistree.cpp
 
 clean:
