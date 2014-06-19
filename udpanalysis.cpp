@@ -16,9 +16,9 @@ UdpAnalysis::~UdpAnalysis()
 {
 }
 
-void UdpAnalysis::analyzeprotocol(size_t *bytes)
+void UdpAnalysis::analyzeProtocol(ProtocolStack &pstack, size_t *bytes)
 {
-	unsigned short *ushort_ptr = _buffer;
+	unsigned short *ushort_ptr = (unsigned short*)_buffer;
 	_src_port = *ushort_ptr;
 	++ushort_ptr;
 
@@ -33,13 +33,14 @@ void UdpAnalysis::analyzeprotocol(size_t *bytes)
 
 	if(bytes != NULL)
 		*bytes += _udp_len;
+	pstack.push_back(this);
 
 	int port = _src_port < _dst_port ? _src_port:_dst_port;
 	Analysis *child = _getChild(port);
 	if(child != NULL)
 	{
 		child->setBuffer(_buffer + 8, _bufsize - 8);
-		child->analyzeProtocol(NULL);
+		child->analyzeProtocol(pstack, NULL);
 	}
 }
 
@@ -50,13 +51,15 @@ void UdpAnalysis::printResult()
 		_src_port, _dst_port);
 	printf("\tUdp len: %u, Check sum: %x\n", 
 		_udp_len, _check_sum);
-	
+
+	/*
 	unsigned short port = _src_port < _dst_port ? _src_port:_dst_port;
 	Analysis *child = _getChild(port);
 	if(child != NULL)
 	{
 		child->printResult();
 	}
+	*/
 }
 
 unsigned short UdpAnalysis::getSrcPort()const

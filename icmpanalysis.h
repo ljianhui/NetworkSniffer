@@ -13,7 +13,8 @@ class IcmpAnalysis : public Analysis
 		unsigned char getCode()const;
 		unsigned short getCheckSum()const;
 		
-		virtual void analyzeProtocol(size_t *bytes = NULL);
+		virtual void analyzeProtocol(ProtocolStack &pstack,
+						size_t *bytes = NULL);
 		virtual void printResult();
 
 	private:

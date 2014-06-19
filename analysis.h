@@ -4,7 +4,12 @@
 #include <string>
 #include <stddef.h>
 #include <list>
+#include <vector>
 #include "typedef.h"
+
+class Analysis;
+
+typedef std::vector<Analysis*> ProtocolStack;
 
 class Analysis
 {
@@ -18,7 +23,8 @@ class Analysis
 		std::string getProtocolName()const;
 		unsigned short getPCode()const;
 
-		virtual void analyzeProtocol(size_t *bytes = NULL) = 0;
+		virtual void analyzeProtocol(ProtocolStack &pstack,
+						size_t *bytes = NULL) = 0;
 		virtual void printResult() = 0;
 
 	protected://function

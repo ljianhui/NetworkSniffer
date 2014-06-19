@@ -1,13 +1,14 @@
 #include "ethernetanalysis.h"
 #include <stdio.h>
+#include <memory.h>
 #include <strings.h>
 
 EthernetAnalysis::EthernetAnalysis():
-	Analysis("Ethernet", ETHER_CODE),
+	Analysis("ethernet", ETHER_CODE),
 	_type(0)
 {
-	bzero(_dst, sizeof(_dst_addr));
-	bzero(_src, sizeof(_src_addr));
+	bzero((void*)_dst_addr, sizeof(_dst_addr));
+	bzero((void*)_src_addr, sizeof(_src_addr));
 }
 
 EthernetAnalysis::~EthernetAnalysis()
@@ -29,8 +30,9 @@ unsigned short EthernetAnalysis::getType()const
 	return _type;
 }
 
-void EthernetAnalysis::analyzeProtocol(size_t *bytes)
+void EthernetAnalysis::analyzeProtocol(ProtocolStack &pstack, size_t *bytes)
 {
+	pstack.push_back(this);
 	if(bytes != NULL)
 		*bytes += 14;
 
@@ -47,7 +49,7 @@ void EthernetAnalysis::analyzeProtocol(size_t *bytes)
 	if(child != NULL)
 	{
 		child->setBuffer(_buffer + 14, _bufsize - 14);
-		child->analyzeprotocol(bytes);
+		child->analyzeProtocol(pstack, bytes);
 	}
 }
 
@@ -55,13 +57,14 @@ void EthernetAnalysis::printResult()
 {
 	printf("Ethernet\n");
 	printf("\tDestination MAC: %s\nSource MAC: %s\n",
-		_macToString(_dst_addr), _macToString(_src_addr));
+		_macAddrToString(_dst_addr), _macAddrToString(_src_addr));
 	printf("\tType: %u\n", _type);
-
+	/*
 	Analysis *child = _getChild(_type);
 	if(child != NULL)
 	{
 		child->printResult();
 	}
+	*/
 }
 

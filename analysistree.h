@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <string>
+#include "analysis.h"
 
 class Analysis;
 
@@ -24,12 +25,17 @@ class AnalysisTree
 
 		void buildAnalysisTree();
 		void setProtocolFilter(const std::string &filter);
+		void setProtocolFilter(const char *filter);
 		void analyzeAndPrint(unsigned char *buffer, size_t bufsize);
-	private:
+
+	private://function
+		bool _existInProtocolStack();
+		void _printProtocolStack();
+
+	private://data
 		std::vector<Analysis*> _node;
 		std::string _filter;
-		unsigned char *_buffer;
-		size_t _bufsize;
+		ProtocolStack _pstack;
 };
 
 #endif

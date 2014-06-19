@@ -9,7 +9,11 @@ IcmpAnalysis::IcmpAnalysis():
 {
 }
 
-void IcmpAnalysis::analyzeProtocol(size_t *bytes)
+IcmpAnalysis::~IcmpAnalysis()
+{
+}
+
+void IcmpAnalysis::analyzeProtocol(ProtocolStack &pstack, size_t *bytes)
 {
 	unsigned char *uchar_ptr = _buffer;
 	_type = *uchar_ptr;
@@ -21,6 +25,10 @@ void IcmpAnalysis::analyzeProtocol(size_t *bytes)
 	unsigned short *ushort_ptr = (unsigned short*)uchar_ptr;
 	_check_sum = *ushort_ptr;
 	++ushort_ptr;
+
+	if(bytes != NULL)
+		*bytes += 4;
+	pstack.push_back(this);
 }
 
 void IcmpAnalysis::printResult()
@@ -40,7 +48,7 @@ unsigned char IcmpAnalysis::getCode()const
 	return _code;
 }
 
-unsigned char IcmpAnalysis::getCheckSum()const
+unsigned short IcmpAnalysis::getCheckSum()const
 {
 	return _check_sum;
 }

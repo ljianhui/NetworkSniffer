@@ -10,7 +10,7 @@ class IpAnalysis : public Analysis
 		virtual ~IpAnalysis();
 
 		unsigned char getVersion()const;
-		unsigned char getHeaderaLen()const;
+		unsigned char getHeaderLen()const;
 		const unsigned char* getDstIp()const;
 		const unsigned char* getSrcIp()const;
 		unsigned short getIpPackageLen()const;
@@ -18,7 +18,8 @@ class IpAnalysis : public Analysis
 		unsigned char getProtocol()const;
 		unsigned short getCheckSum()const;
 
-		virtual void analyzeProtocol(size_t *bytes = NULL);
+		virtual void analyzeProtocol(ProtocolStack &pstack,
+						size_t *bytes = NULL);
 		virtual void printResult();
 	private:
 		unsigned char _version;

@@ -21,7 +21,8 @@ class TcpAnalysis : public Analysis
 		size_t hasFinFlag()const;
 		size_t hasRstFlag()const;
 
-		virtual void analyzeProtocol(size_t *bytes = NULL);
+		virtual void analyzeProtocol(ProtocolStack &pstack, 
+						size_t *bytes = NULL);
 		virtual void printResult();
 
 	private:

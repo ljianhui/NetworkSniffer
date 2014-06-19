@@ -3,8 +3,8 @@
 #include <memory.h>
 #include <stdio.h>
 
-ArpAnalysis::ArpAnalysis:
-	Analysis("ARP", ARP_CODE),
+ArpAnalysis::ArpAnalysis():
+	Analysis("arp", ARP_CODE),
 	_hardware(0),
 	_protocol(0),
 	_hdaddr_len(0),
@@ -66,7 +66,7 @@ const unsigned char* ArpAnalysis::getDstProtocolAddr()const
 	return _dst_pr_addr;
 }
 
-void ArpAnalysis::analyzeProtocol(size_t *bytes)
+void ArpAnalysis::analyzeProtocol(ProtocolStack &pstack, size_t *bytes)
 {
 	unsigned short *ushort_ptr = (unsigned short*)_buffer;
 	unsigned char *uchar_ptr = _buffer;
@@ -102,6 +102,7 @@ void ArpAnalysis::analyzeProtocol(size_t *bytes)
 	
 	if(bytes != NULL);
 		*bytes += (uchar_ptr - _buffer);
+	pstack.push_back(this);
 }
 
 void ArpAnalysis::printResult()

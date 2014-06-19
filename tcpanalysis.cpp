@@ -20,9 +20,9 @@ TcpAnalysis::~TcpAnalysis()
 {
 }
 
-void TcpAnalysis::analyzeProtocol(size_t *bytes)
+void TcpAnalysis::analyzeProtocol(ProtocolStack &pstack, size_t *bytes)
 {
-	unsigned short *ushort_ptr = _buffer;
+	unsigned short *ushort_ptr = (unsigned short*)_buffer;
 	_src_port = *ushort_ptr;
 	++ushort_ptr;
 
@@ -54,6 +54,7 @@ void TcpAnalysis::analyzeProtocol(size_t *bytes)
 	
 	if(bytes != NULL)
 		*bytes += _header_len;
+	pstack.push_back(this);
 	
 	int port = _src_port < _dst_port ? _src_port : _dst_port;
 	Analysis *child = _getChild(port);
@@ -61,7 +62,7 @@ void TcpAnalysis::analyzeProtocol(size_t *bytes)
 	{
 		child->setBuffer(_buffer + _header_len, 
 				_bufsize - _header_len);
-		child->analyzeProtocol(bytes);
+		child->analyzeProtocol(pstack, bytes);
 	}
 }
 
@@ -73,16 +74,18 @@ void TcpAnalysis::printResult()
 	printf("\tSequence number: %u, Ack number: %u\n",
 		_seq, _ack);
 	printf("\tHeader len: %u, ACK: %u, SYN: %u, FIN: %u\n",
-		_head_len, hasAckFlag(), hasSynFlag(), hasFinFlag());
-	printf("\tWindow size: %u, Check sum: %x",
+		_header_len, hasAckFlag(), hasSynFlag(), hasFinFlag());
+	printf("\tWindow size: %u, Check sum: %x\n",
 		_window, _check_sum);
-	
+
+	/*
 	int port = _src_port < _dst_port ? _src_port : _dst_port;
 	Analysis *child = _getChild(port);
 	if(child != NULL)
 	{
 		child->printResult();
 	}
+	*/
 }
 
 unsigned short TcpAnalysis::getSrcPort()const
@@ -100,7 +103,7 @@ size_t TcpAnalysis::getSequenceNumber()const
 	return _seq;
 }
 
-size_t gTcpAnalysis::etAckNumber()const
+size_t TcpAnalysis::getAckNumber()const
 {
 	return _ack;
 }

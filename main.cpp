@@ -1,21 +1,19 @@
 #include <unistd.h>
+#include <signal.h>
+#include <sys/types.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <pthread.h>
-#include "rowsocket.h"
-#include "analysis.h"
-#include "ethernetanalysis.h"
-#include "arpanalysis.h"
-#include "ipanalysis.h"
-#include "icmpanalysis.h"
-#include "tcpanalysis.h"
-#include "udpanalysis.h"
+#include <memory.h>
+#include "rawsocket.h"
+#include "analysistree.h"
 
 struct ThreadArg
 {
 	unsigned char *buffer;
 	size_t buf_row;
 	size_t buf_col;
-	size_t root;
+	const char *filter;
 	int *r_pos;
 	int *w_pos;
 };
@@ -28,48 +26,58 @@ bool running = true;
 int main(int argc, char **argv)
 {
 	char arg = '\0';
-	size_t opt = 0;
-	char* optargs[5] = {0};
+	char *opts[5] = {0};
+
+	memset(opts, 0, sizeof(opts));
 
 	//analyze the input arguments
 	while((arg = getopt(argc, argv, "p:i:g")) != -1)
 	{
-		opt = 0;
 		switch(arg)
 		{
 			case 'p':
-				opt += 1;
-				optargs[0] = optarg;
+				opts[0] = optarg;
 				break;
 			case 'i':
-				opt += 2;
-				optargs[1] = optarg;
+				opts[1] = optarg;
 				break;
 			case 'g':
-				opt += 4;
+				opts[2] = &arg;
 				break;
 			default:
-				opt += 8;
-				optargs[3] = &opt;
+				opts[3] = &arg;
 		}
 	}
 
 	//control the cmd
-	if(opt & (0x1 << 3))
+	if(opts[3] != 0)
 	{
-		fprintf(stderr, "unkown arguments: %c\n", *optargs[3]);
-		return 0;
+		fprintf(stderr, "unkown argmemts %c\n", *opts[3]);
+		exit(EXIT_FAILURE);
+	}
+	
+	if(opts[2] != NULL)
+	{
+		int ret = execvp("./NetSnifferGui", argv);
+		fprintf(stderr, "Can not find the app NetSnifferGui\n");
+		exit(EXIT_FAILURE);
 	}
 
 	RawSocket rawsock;
-	int root = 0;
-	if(opt & (0x1))
+	ThreadArg thread_arg;
+	if(rawsock.createSocket())
 	{
-		root = rawsock.createSocket(optargs[0]);
+		fprintf(stderr, "create socket failed\n");
+		exit(EXIT_FAILURE);
 	}
-	if(opt & (0x1 << 2))
+
+	if(opts[0] != NULL)
 	{
-		rawsock.bind(optargs[1]);
+		thread_arg.filter = opts[0];
+	}
+	if(opts[1] != NULL)
+	{
+		rawsock.bindInterface(opts[1]);
 	}
 
 	const int row = 100;
@@ -79,11 +87,9 @@ int main(int argc, char **argv)
 	int r_pos = 0;
 	int w_pos = 0;
 
-	ThreadArg thread_arg;
 	thread_arg.buffer = buffer;
 	thread_arg.buf_row = row;
 	thread_arg.buf_col = col;
-	thread_arg.root = root;
 	thread_arg.r_pos = &r_pos;
 	thread_arg.w_pos = &w_pos;
 
@@ -91,8 +97,8 @@ int main(int argc, char **argv)
 	void *thread_ret = NULL;
 	tid = pthread_create(&tid, NULL, AnalysisThread, &thread_arg);
 
-	single(SIGTERM, DoBeforeExit);
-	single(SIGINT, DoBeforeExit);
+	signal(SIGTERM, DoBeforeExit);
+	signal(SIGINT, DoBeforeExit);
 
 	while(running)
 	{
@@ -112,4 +118,25 @@ int main(int argc, char **argv)
 void DoBeforeExit(int sig)
 {
 	running = false;
+}
+
+void* AnalysisThread(void *arg)
+{
+	ThreadArg *thread_arg = (ThreadArg*)arg;
+	AnalysisTree analy_tree;
+	analy_tree.buildAnalysisTree();
+	analy_tree.setProtocolFilter(thread_arg->filter);
+	while(running)
+	{
+		if(*(thread_arg->r_pos) != *(thread_arg->w_pos))
+		{
+			unsigned char *buf_begin = thread_arg->buffer + 
+				*(thread_arg->r_pos) * thread_arg->buf_col;
+			analy_tree.analyzeAndPrint(buf_begin, thread_arg->buf_col);
+			++(*(thread_arg->r_pos));
+			if(*(thread_arg->r_pos) == thread_arg->buf_row)
+				*(thread_arg->r_pos) = 0;
+		}
+	}
+	pthread_exit(NULL);
 }

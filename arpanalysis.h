@@ -16,10 +16,11 @@ class ArpAnalysis : public Analysis
 		unsigned short getOpt()const;
 		const unsigned char* getSrcHardwareAddr()const;
 		const unsigned char* getSrcProtocolAddr()const;
-		const unsigned char* getDstHarewareAddr()const;
-		const unsigned char* getDstprotocolAddr()const;
+		const unsigned char* getDstHardwareAddr()const;
+		const unsigned char* getDstProtocolAddr()const;
 
-		virtual void analyzeProtocol(size_t *bytes = NULL);
+		virtual void analyzeProtocol(ProtocolStack &pstack,
+						size_t *bytes = NULL);
 		virtual void printResult();
 	private:
 		unsigned short _hardware;

@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <strings.h>
-#include <memcpy.h>
+#include <memory.h>
 #include "ipanalysis.h"
 
 IpAnalysis::IpAnalysis():
@@ -20,7 +20,7 @@ IpAnalysis::~IpAnalysis()
 {
 }
 
-unsigned char getVersion()const
+unsigned char IpAnalysis::getVersion()const
 {
 	return _version;
 }
@@ -60,7 +60,7 @@ unsigned short IpAnalysis::getCheckSum()const
 	return _check_sum;
 }
 
-void IpAnalysis::analyzeProtocol(size_t *bytes)
+void IpAnalysis::analyzeProtocol(ProtocolStack &pstack, size_t *bytes)
 {
 	unsigned char *uchar_ptr = _buffer;
 	_version = *uchar_ptr;
@@ -95,12 +95,14 @@ void IpAnalysis::analyzeProtocol(size_t *bytes)
 
 	if(bytes != NULL)
 		*bytes += _ip_package_len;
+	pstack.push_back(this);
 
 	Analysis *child = _getChild(_protocol);
 	if(child != NULL)
 	{
-		child->setBuffer(_buffer + header_len, _bufsize - header_len);
-		child->analyzeProtocol(NULL);
+		child->setBuffer(_buffer + _header_len, 
+				_bufsize - _header_len);
+		child->analyzeProtocol(pstack, NULL);
 	}
 
 }
@@ -114,12 +116,13 @@ void IpAnalysis::printResult()
 		_ttl, _protocol, _check_sum);
 	printf("\tSoruce IP addr: %s, Destination IP addr: %s\n",
 		_ipAddrToString(_src_addr), _ipAddrToString(_dst_addr));
-	
+
+	/*
 	Analysis *child = _getChild(_protocol)
 	if(child != NULL)
 	{
 		child->printResult();
 	}
-
+	*/
 }
 
