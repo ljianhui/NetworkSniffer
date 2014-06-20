@@ -1,12 +1,10 @@
 #include <stdio.h>
+#include <memory.h>
 #include <netinet/in.h>
 #include "icmpanalysis.h"
 
 IcmpAnalysis::IcmpAnalysis():
-	Analysis("icmp", ICMP_CODE),
-	_type(0),
-	_code(0),
-	_check_sum(0)
+	Analysis("icmp", ICMP_CODE)
 {
 }
 
@@ -16,16 +14,15 @@ IcmpAnalysis::~IcmpAnalysis()
 
 void IcmpAnalysis::analyzeProtocol(ProtocolStack &pstack, size_t *bytes)
 {
-	unsigned char *uchar_ptr = _buffer;
-	_type = *uchar_ptr;
-	++uchar_ptr;
+	if(_bufsize < sizeof(_icmphdr))
+	{
+		bzero(&_icmphdr, sizeof(_icmphdr));
+		return;
+	}
 
-	_code = *uchar_ptr;
-	++uchar_ptr;
+	memcpy(&_icmphdr, _buffer, sizeof(_icmphdr));
 
-	unsigned short *ushort_ptr = (unsigned short*)uchar_ptr;
-	_check_sum = ntohs(*ushort_ptr);
-	++ushort_ptr;
+	_icmphdr.checksum = ntohs(_icmphdr.checksum);
 
 	if(bytes != NULL)
 		*bytes += 4;
@@ -36,21 +33,21 @@ void IcmpAnalysis::printResult()
 {
 	printf("ICMP:\n");
 	printf("\tType: %u, Code: %u, Check sum: 0x%x\n",
-		_type, _code, _check_sum);
+		_icmphdr.type, _icmphdr.code, _icmphdr.checksum);
 }
 
 unsigned char IcmpAnalysis::getType()const
 {
-	return _type;
+	return _icmphdr.type;
 }
 
 unsigned char IcmpAnalysis::getCode()const
 {
-	return _code;
+	return _icmphdr.code;
 }
 
 unsigned short IcmpAnalysis::getCheckSum()const
 {
-	return _check_sum;
+	return _icmphdr.checksum;
 }
 

@@ -1,6 +1,7 @@
 #ifndef ICMPANALYSIS_H_INCLUDE
 #define ICMPANALYSIS_H_INCLUDE
 
+#include <netinet/ip_icmp.h>
 #include "analysis.h"
 
 class IcmpAnalysis : public Analysis
@@ -18,9 +19,7 @@ class IcmpAnalysis : public Analysis
 		virtual void printResult();
 
 	private:
-		unsigned char _type;
-		unsigned char _code;
-		unsigned short _check_sum;
+		icmphdr _icmphdr;
 };
 
 #endif

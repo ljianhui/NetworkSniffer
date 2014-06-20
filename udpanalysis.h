@@ -1,6 +1,7 @@
 #ifndef UDPANALYSIS_H_INCLUDE
 #define UDPANALYSIS_H_INCLUDE
 
+#include <netinet/udp.h>
 #include "analysis.h"
 
 class UdpAnalysis : public Analysis
@@ -19,10 +20,7 @@ class UdpAnalysis : public Analysis
 		virtual void printResult();
 
 	private:
-		unsigned short _src_port;
-		unsigned short _dst_port;
-		unsigned short _udp_len;
-		unsigned short _check_sum;
+		udphdr _udphdr;
 };
 
 #endif

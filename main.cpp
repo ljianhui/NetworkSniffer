@@ -8,18 +8,7 @@
 #include "rawsocket.h"
 #include "analysistree.h"
 
-struct ThreadArg
-{
-	unsigned char *buffer;
-	size_t buf_row;
-	size_t buf_col;
-	const char *filter;
-	int *r_pos;
-	int *w_pos;
-};
-
 void DoBeforeExit(int sig);
-void* AnalysisThread(void *thread_arg);
 
 bool running = true;
 
@@ -59,67 +48,39 @@ int main(int argc, char **argv)
 	if(opts[2] != NULL)
 	{
 		int ret = execvp("./NetSnifferGui", argv);
-		fprintf(stderr, "Can not find the app NetSnifferGui\n");
+		fprintf(stderr, "Can not find the app ./NetSnifferGui\n");
 		exit(EXIT_FAILURE);
 	}
 
 	RawSocket rawsock;
-	ThreadArg thread_arg;
+
 	if(rawsock.createSocket() == false)
 	{
 		fprintf(stderr, "create socket failed\n");
 		exit(EXIT_FAILURE);
 	}
 
-	if(opts[0] != NULL)
-	{
-		thread_arg.filter = opts[0];
-	}
 	if(opts[1] != NULL)
 	{
 		rawsock.bindInterface(opts[1]);
 	}
-
-	const int row = 100;
-	const int col = 200;
-	unsigned char *buffer = new unsigned char[row * col];
-
-	int r_pos = 0;
-	int w_pos = 0;
-
-	thread_arg.buffer = buffer;
-	thread_arg.buf_row = row;
-	thread_arg.buf_col = col;
-	thread_arg.r_pos = &r_pos;
-	thread_arg.w_pos = &w_pos;
-/*
-	pthread_t tid = 0;
-	void *thread_ret = NULL;
-	tid = pthread_create(&tid, NULL, AnalysisThread, &thread_arg);
-*/
+	
+	//set signal controller
 	signal(SIGTERM, DoBeforeExit);
 	signal(SIGINT, DoBeforeExit);
 	
-	AnalysisTree analy_tree;
-	analy_tree.buildAnalysisTree();
-	analy_tree.setProtocolFilter(opts[0]);
+	AnalysisTree analysis_tree;
+	analysis_tree.buildAnalysisTree();
+	analysis_tree.setProtocolFilter(opts[0]);
+	unsigned char buffer[BUF_SIZE];
+
 	while(running)
 	{
-		//unsigned char *buf_begin = buffer + w_pos * col;
-		bzero(buffer, col);
-		rawsock.recvPacket(buffer, col);
-		analy_tree.analyzeAndPrint(buffer, col);
-		
-		/*
-		if(++w_pos == row)
-			w_pos = 0;
-		*/
+		bzero(buffer, BUF_SIZE);
+		rawsock.recvPacket(buffer, BUF_SIZE);
+		analysis_tree.analyzeAndPrint(buffer, BUF_SIZE);
 	}
-	
-//	int ret = pthread_join(tid, &thread_ret);
-	
-	delete[] buffer;
-	return 0;
+	exit(EXIT_SUCCESS);
 }
 
 void DoBeforeExit(int sig)
@@ -127,23 +88,3 @@ void DoBeforeExit(int sig)
 	running = false;
 }
 
-void* AnalysisThread(void *arg)
-{
-	ThreadArg *thread_arg = (ThreadArg*)arg;
-	AnalysisTree analy_tree;
-	analy_tree.buildAnalysisTree();
-	analy_tree.setProtocolFilter(thread_arg->filter);
-	while(running)
-	{
-		if(*(thread_arg->r_pos) != *(thread_arg->w_pos))
-		{
-			unsigned char *buf_begin = thread_arg->buffer + 
-				*(thread_arg->r_pos) * thread_arg->buf_col;
-			analy_tree.analyzeAndPrint(buf_begin, thread_arg->buf_col);
-			++(*(thread_arg->r_pos));
-			if(*(thread_arg->r_pos) == thread_arg->buf_row)
-				*(thread_arg->r_pos) = 0;
-		}
-	}
-//	pthread_exit(NULL);
-}

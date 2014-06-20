@@ -1,6 +1,7 @@
 #ifndef ETHERNETANALYSIS_H_INCLUDE
 #define ETHERNETANALYSIS_H_INCLUDE
 
+#include <net/ethernet.h>
 #include "analysis.h"
 
 class EthernetAnalysis : public Analysis
@@ -17,9 +18,7 @@ class EthernetAnalysis : public Analysis
 						size_t *bytes = NULL);
 		virtual void printResult();
 	private:
-		unsigned char _dst_addr[MAC_LEN];
-		unsigned char _src_addr[MAC_LEN];
-		unsigned short _type;
+		ether_header _etherhdr;
 };
 
 #endif

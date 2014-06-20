@@ -5,61 +5,51 @@
 #include "ethernetanalysis.h"
 
 EthernetAnalysis::EthernetAnalysis():
-	Analysis("ethernet", ETHER_CODE),
-	_type(0)
+	Analysis("ethernet", ETHER_CODE)
 {
-	bzero((void*)_dst_addr, sizeof(_dst_addr));
-	bzero((void*)_src_addr, sizeof(_src_addr));
+	bzero((void*)&_etherhdr, sizeof(_etherhdr));
 }
 
 EthernetAnalysis::~EthernetAnalysis()
 {
 }
 
-const unsigned char* EthernetAnalysis::getDstAddr()const
-{
-	return _dst_addr;
-}
-
-const unsigned char* EthernetAnalysis::getSrcAddr()const
-{
-	return _src_addr;
-}
-
-unsigned short EthernetAnalysis::getType()const
-{
-	return _type;
-}
-
 void EthernetAnalysis::analyzeProtocol(ProtocolStack &pstack, size_t *bytes)
 {
+	if(_bufsize < sizeof(_etherhdr))
+	{
+		bzero(&_etherhdr, sizeof(_etherhdr));
+		return;
+	}
+
+	memcpy(&_etherhdr, _buffer, sizeof(_etherhdr));
+	_etherhdr.ether_type = ntohs(_etherhdr.ether_type);
+
 	pstack.push_back(this);
 	if(bytes != NULL)
-		*bytes += 14;
+		*bytes += sizeof(_etherhdr);
 
-	unsigned char *uchar_ptr = _buffer;
-	memcpy(_dst_addr, uchar_ptr, sizeof(_dst_addr));
-	uchar_ptr += sizeof(_dst_addr);
-	memcpy(_src_addr, uchar_ptr, sizeof(_src_addr));
-	uchar_ptr += sizeof(_src_addr);
-
-	unsigned short *ushort_ptr = (unsigned short*)uchar_ptr;
-	_type = ntohs(*ushort_ptr);
-
-	Analysis *child = _getChild(_type);
+	Analysis *child = _getChild(_etherhdr.ether_type);
 	if(child != NULL)
 	{
-		child->setBuffer(_buffer + 14, _bufsize - 14);
+		child->setBuffer(_buffer + sizeof(_etherhdr), 
+				_bufsize - sizeof(_etherhdr));
 		child->analyzeProtocol(pstack, bytes);
 	}
 }
 
 void EthernetAnalysis::printResult()
 {
+	char dst_buf[18] = {0};
+	char src_buf[18] = {0};
 	printf("Ethernet:\n");
-	printf("\tDestination MAC: %s\n", _macAddrToString(_dst_addr));
-	printf("\tSource MAC: %s\n", _macAddrToString(_src_addr));
-	printf("\tType: 0x%x\n", _type);
+	printf("\tDestination MAC: %s\n", 
+		_macAddrToString(_etherhdr.ether_dhost, dst_buf, 
+				sizeof(dst_buf)));
+	printf("\tSource MAC: %s\n", 
+		_macAddrToString(_etherhdr.ether_shost, src_buf,
+				sizeof(src_buf)));
+	printf("\tType: 0x%x\n", _etherhdr.ether_type);
 	/*
 	Analysis *child = _getChild(_type);
 	if(child != NULL)
@@ -69,3 +59,17 @@ void EthernetAnalysis::printResult()
 	*/
 }
 
+const unsigned char* EthernetAnalysis::getDstAddr()const
+{
+	return _etherhdr.ether_dhost;
+}
+
+const unsigned char* EthernetAnalysis::getSrcAddr()const
+{
+	return _etherhdr.ether_shost;
+}
+
+unsigned short EthernetAnalysis::getType()const
+{
+	return _etherhdr.ether_type;
+}

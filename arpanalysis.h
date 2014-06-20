@@ -3,6 +3,19 @@
 
 #include "analysis.h"
 
+struct arp_header
+{
+	unsigned short hardware;
+	unsigned short protocol;
+	unsigned char hdaddr_len;
+	unsigned char praddr_len;
+	unsigned short opt;
+	unsigned char src_hd_addr[6];
+	size_t src_pr_addr;
+	unsigned char dst_hd_addr[6];
+	size_t dst_pr_addr;
+};
+
 class ArpAnalysis : public Analysis
 {
 	public:
@@ -23,15 +36,7 @@ class ArpAnalysis : public Analysis
 						size_t *bytes = NULL);
 		virtual void printResult();
 	private:
-		unsigned short _hardware;
-		unsigned short _protocol;
-		unsigned char _hdaddr_len;
-		unsigned char _praddr_len;
-		unsigned short _opt;
-		unsigned char _src_hd_addr[6];
-		size_t _src_pr_addr;
-		unsigned char _dst_hd_addr[6];
-		size_t _dst_pr_addr;
+		arp_header _arphdr;
 };
 
 #endif

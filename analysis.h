@@ -14,7 +14,7 @@ class Analysis
 		virtual ~Analysis();
 
 		void addChild(Analysis *child);
-		void setBuffer(unsigned char *buffer, size_t bufsize);
+		void setBuffer(const unsigned char *buffer, size_t bufsize);
 		
 		std::string getProtocolName()const;
 		unsigned short getPCode()const;
@@ -25,11 +25,13 @@ class Analysis
 
 	protected://function
 		Analysis* _getChild(int code);
-		const char* _macAddrToString(const unsigned char *macaddr);
-		const char* _ipAddrToString(size_t ipaddr);
+		const char* _macAddrToString(const unsigned char *macaddr, 
+					char *buffer, size_t bufsize);
+		const char* _ipAddrToString(size_t ipaddr, 
+					char *buffer, size_t bufsize);
 
 	protected://data
-		unsigned char *_buffer;
+		const unsigned char *_buffer;
 		size_t _bufsize;
 		std::string _protocol_name;
 
@@ -37,7 +39,6 @@ class Analysis
 
 	private:
 		std::list<Analysis*> _childern;
-		char _addr_str[18];
 };
 
 #endif

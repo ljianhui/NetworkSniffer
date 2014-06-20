@@ -5,12 +5,9 @@
 #include "udpanalysis.h"
 
 UdpAnalysis::UdpAnalysis():
-	Analysis("udp", UDP_CODE),
-	_src_port(0),
-	_dst_port(0),
-	_udp_len(0),
-	_check_sum(0)
+	Analysis("udp", UDP_CODE)
 {
+	bzero(&_udphdr, sizeof(_udphdr));
 }
 
 UdpAnalysis::~UdpAnalysis()
@@ -19,24 +16,23 @@ UdpAnalysis::~UdpAnalysis()
 
 void UdpAnalysis::analyzeProtocol(ProtocolStack &pstack, size_t *bytes)
 {
-	unsigned short *ushort_ptr = (unsigned short*)_buffer;
-	_src_port = ntohs(*ushort_ptr);
-	++ushort_ptr;
-
-	_dst_port = ntohs(*ushort_ptr);
-	++ushort_ptr;
-
-	_udp_len = ntohs(*ushort_ptr);
-	++ushort_ptr;
-
-	_check_sum = ntohs(*ushort_ptr);
-	++ushort_ptr;
+	if(_bufsize < sizeof(_udphdr))
+	{
+		bzero(&_udphdr, sizeof(_udphdr));
+		return;
+	}
+	
+	memcpy(&_udphdr, _buffer, sizeof(_udphdr));
+	_udphdr.source = ntohs(_udphdr.source);
+	_udphdr.dest = ntohs(_udphdr.dest);
+	_udphdr.len = ntohs(_udphdr.len);
+	_udphdr.check = ntohs(_udphdr.check);
 
 	if(bytes != NULL)
-		*bytes += _udp_len;
+		*bytes += _udphdr.len;
 	pstack.push_back(this);
 
-	int port = _src_port < _dst_port ? _src_port:_dst_port;
+	int port = _udphdr.source < _udphdr.dest ? _udphdr.source:_udphdr.dest;
 	Analysis *child = _getChild(port);
 	if(child != NULL)
 	{
@@ -49,9 +45,9 @@ void UdpAnalysis::printResult()
 {
 	printf("UDP:\n");
 	printf("\tSource port: %u, Destination port: %u\n",
-		_src_port, _dst_port);
+		_udphdr.source, _udphdr.dest);
 	printf("\tUdp len: %u, Check sum: 0x%x\n", 
-		_udp_len, _check_sum);
+		_udphdr.len, _udphdr.check);
 
 	/*
 	unsigned short port = _src_port < _dst_port ? _src_port:_dst_port;
@@ -65,21 +61,21 @@ void UdpAnalysis::printResult()
 
 unsigned short UdpAnalysis::getSrcPort()const
 {
-	return _src_port;
+	return _udphdr.source;
 }
 
 unsigned short UdpAnalysis::getDstPort()const
 {
-	return _dst_port;
+	return _udphdr.dest;
 }
 
 unsigned short UdpAnalysis::getUdpLen()const
 {
-	return _udp_len;
+	return _udphdr.len;
 }
 
 unsigned short UdpAnalysis::getCheckSum()const
 {
-	return _check_sum;
+	return _udphdr.check;
 }
 

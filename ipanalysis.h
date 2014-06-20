@@ -1,6 +1,7 @@
 #ifndef IPANALYSIS_H_INCLUDE
 #define IPANALYSIS_H_INCLUDE
 
+#include <netinet/ip.h>
 #include "analysis.h"
 
 class IpAnalysis : public Analysis
@@ -22,14 +23,7 @@ class IpAnalysis : public Analysis
 						size_t *bytes = NULL);
 		virtual void printResult();
 	private:
-		unsigned char _version;
-		unsigned char _header_len;
-		unsigned short _ip_package_len;
-		unsigned char _ttl;
-		unsigned char _protocol;
-		unsigned short _check_sum;
-		size_t _dst_addr;
-		size_t _src_addr;
+		iphdr _iphdr;
 };
 
 #endif

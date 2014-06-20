@@ -5,16 +5,9 @@
 #include "ipanalysis.h"
 
 IpAnalysis::IpAnalysis():
-	Analysis("ip", IP_CODE),
-	_version(4),
-	_header_len(0),
-	_ip_package_len(0),
-	_ttl(0),
-	_protocol(0),
-	_check_sum(0),
-	_dst_addr(0),
-	_src_addr(0)
+	Analysis("ip", 0x0800)
 {
+	bzero(&_iphdr, sizeof(_iphdr));
 }
 
 IpAnalysis::~IpAnalysis()
@@ -23,49 +16,26 @@ IpAnalysis::~IpAnalysis()
 
 void IpAnalysis::analyzeProtocol(ProtocolStack &pstack, size_t *bytes)
 {
-	unsigned char *uchar_ptr = _buffer;
-	_version = *uchar_ptr;
-	_version = _version >> 4;
-	
-	_header_len = *uchar_ptr;
-	_header_len &= 0x0f;
-	_header_len *= sizeof(size_t);
-	++uchar_ptr;
-	++uchar_ptr;
+	if(_bufsize < sizeof(_iphdr))
+	{
+		bzero(&_iphdr, sizeof(_iphdr));
+		return;
+	}
 
-	unsigned short *ushort_ptr = (unsigned short*)uchar_ptr;
-	_ip_package_len = ntohs(*ushort_ptr);
-	++ushort_ptr;
-	
-	ushort_ptr += 2;
+	memcpy(&_iphdr, _buffer, sizeof(_iphdr));
 
-	uchar_ptr = (unsigned char*)ushort_ptr;
-	_ttl = *uchar_ptr;
-	++uchar_ptr;
-
-	_protocol = *uchar_ptr;
-	++uchar_ptr;
-
-	ushort_ptr = (unsigned short*)uchar_ptr;
-	_check_sum = ntohs(*ushort_ptr);
-	++ushort_ptr;
-
-	size_t *uint_ptr = (size_t*)ushort_ptr;
-	_src_addr = ntohl(*uint_ptr);
-	++uint_ptr;
-
-	_dst_addr = ntohl(*uint_ptr);
-	++uint_ptr;
+	_iphdr.tot_len = ntohs(_iphdr.tot_len);
+	_iphdr.check = ntohs(_iphdr.check);
 
 	if(bytes != NULL)
-		*bytes += _ip_package_len;
+		*bytes += _iphdr.tot_len;
 	pstack.push_back(this);
 
-	Analysis *child = _getChild(_protocol);
+	Analysis *child = _getChild(_iphdr.protocol);
 	if(child != NULL)
 	{
-		child->setBuffer(_buffer + _header_len, 
-				_bufsize - _header_len);
+		child->setBuffer(_buffer + getHeaderLen(), 
+				_bufsize - getHeaderLen());
 		child->analyzeProtocol(pstack, NULL);
 	}
 
@@ -75,11 +45,15 @@ void IpAnalysis::printResult()
 {
 	printf("IP:\n");
 	printf("\tVersion: %u, Header len: %u, Total len: %u\n",
-		_version, _header_len, _ip_package_len);
+		_iphdr.version, _iphdr.ihl*4, _iphdr.tot_len);
 	printf("\tTTL: %u, Protocol: %u, Check sum: 0x%x\n",
-		_ttl, _protocol, _check_sum);
+		_iphdr.ttl, _iphdr.protocol, _iphdr.check);
+
+	char ipsrc[16] = {0};
+	char ipdst[16] = {0};
 	printf("\tSoruce IP addr: %s, Destination IP addr: %s\n",
-		_ipAddrToString(_src_addr), _ipAddrToString(_dst_addr));
+		_ipAddrToString(_iphdr.saddr, ipsrc, sizeof(ipsrc)),
+		_ipAddrToString(_iphdr.daddr, ipdst, sizeof(ipdst)));
 
 	/*
 	Analysis *child = _getChild(_protocol)
@@ -92,41 +66,41 @@ void IpAnalysis::printResult()
 
 unsigned char IpAnalysis::getVersion()const
 {
-	return _version;
+	return _iphdr.version;
 }
 
 unsigned char IpAnalysis::getHeaderLen()const
 {
-	return _header_len;
+	return _iphdr.ihl * 4;
 }
 
 size_t IpAnalysis::getDstIp()const
 {
-	return _dst_addr;
+	return _iphdr.saddr;
 }
 
 size_t IpAnalysis::getSrcIp()const
 {
-	return _src_addr;
+	return _iphdr.daddr;
 }
 
 unsigned short IpAnalysis::getIpPackageLen()const
 {
-	return _ip_package_len;
+	return _iphdr.tot_len;
 }
 
 unsigned char IpAnalysis::getTTL()const
 {
-	return _ttl;
+	return _iphdr.ttl;
 }
 
 unsigned char IpAnalysis::getProtocol()const
 {
-	return _protocol;
+	return _iphdr.protocol;
 }
 
 unsigned short IpAnalysis::getCheckSum()const
 {
-	return _check_sum;
+	return _iphdr.check;
 }
 

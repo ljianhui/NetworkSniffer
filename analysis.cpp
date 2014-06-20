@@ -1,5 +1,7 @@
+#include <netinet/ether.h>
+#include <arpa/inet.h>
+#include <stdio.h>
 #include "analysis.h"
-#include "stdio.h"
 
 Analysis::Analysis(const std::string &pname, int pcode):
 	_buffer(NULL),
@@ -18,10 +20,10 @@ void Analysis::addChild(Analysis *child)
 	_childern.push_back(child);
 }
 
-void Analysis::setBuffer(unsigned char *buffer, size_t bufsize)
+void Analysis::setBuffer(const unsigned char *buffer, size_t bufsize)
 {
 	_buffer = buffer;
-	bufsize = bufsize;
+	_bufsize = bufsize;
 }
 
 std::string Analysis::getProtocolName()const
@@ -45,19 +47,26 @@ Analysis* Analysis::_getChild(int code)
 	return NULL;
 }
 
-const char* Analysis::_macAddrToString(const unsigned char *macaddr)
+const char* Analysis::_macAddrToString(const unsigned char *macaddr,
+			char *buffer, size_t bufsize)
 {
-	sprintf(_addr_str, "%x:%x:%x:%x:%x:%x", 
+	if(buffer == NULL || bufsize < 18)
+		return NULL;
+	
+	sprintf(buffer, "%x:%x:%x:%x:%x:%x", 
 		macaddr[0], macaddr[1], macaddr[2], 
 		macaddr[3], macaddr[4], macaddr[5]);
-	return _addr_str;
+	return buffer;
+	
+	/*
+	return ether_ntoa((struct ether_addr*)macaddr);
+	*/
 }
 
-const char* Analysis::_ipAddrToString(size_t ipaddr)
+const char* Analysis::_ipAddrToString(size_t ipaddr, 
+			char *buffer, size_t bufsize)
 {
-	size_t *uint_ptr = &ipaddr;
-	unsigned char *pipaddr = (unsigned char*)uint_ptr;
-	sprintf(_addr_str, "%u.%u.%u.%u",
-		pipaddr[0], pipaddr[1], pipaddr[2], pipaddr[3]);
-	return _addr_str;
+	in_addr addr;
+	addr.s_addr = ipaddr;
+	return inet_ntop(AF_INET, &addr, buffer, bufsize);
 }
