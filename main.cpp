@@ -47,7 +47,7 @@ int main(int argc, char **argv)
 	
 	if(opts[2] != NULL)
 	{
-		int ret = execvp("./NetSnifferGui", argv);
+		int ret = execlp("./NetSnifferGui", "./NetSnifferGui", "-g", 0);
 		fprintf(stderr, "Can not find the app ./NetSnifferGui\n");
 		exit(EXIT_FAILURE);
 	}
@@ -66,8 +66,8 @@ int main(int argc, char **argv)
 	}
 	
 	//set signal controller
-	signal(SIGTERM, DoBeforeExit);
-	signal(SIGINT, DoBeforeExit);
+	//signal(SIGTERM, DoBeforeExit);
+	//signal(SIGINT, DoBeforeExit);
 	
 	AnalysisTree analysis_tree;
 	analysis_tree.buildAnalysisTree();
