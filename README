@@ -48,4 +48,8 @@ Core design thinking:
 	Composite patterns
 		
 help:
+	-i(interface) : the name of network interface, such as -i eth0, catch the packet of eth0
 
+	-p(protocol) : set protocol filter, such as -p tcp, view the tcp packet
+
+	-g(Gui) : use the gui view, ps: the app ./netsniffer and ./NetSnifferGui must in the same dir
