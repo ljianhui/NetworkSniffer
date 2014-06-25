@@ -47,7 +47,7 @@ int main(int argc, char **argv)
 	
 	if(opts[2] != NULL)
 	{
-		int ret = execlp("./NetSnifferGui", "./NetSnifferGui", "-g", 0);
+		int ret = execlp("./NetSnifferGui", "./NetSnifferGui", 0);
 		fprintf(stderr, "Can not find the app ./NetSnifferGui\n");
 		exit(EXIT_FAILURE);
 	}
