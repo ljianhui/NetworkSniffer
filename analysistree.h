@@ -24,6 +24,7 @@ class AnalysisTree
 		~AnalysisTree();
 
 		void buildAnalysisTree();
+		void releaseAnalysisTree();
 		void setProtocolFilter(const std::string &filter);
 		void setProtocolFilter(const char *filter);
 		void analyzeAndPrint(unsigned char *buffer, size_t bufsize);

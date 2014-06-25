@@ -17,15 +17,13 @@ AnalysisTree::AnalysisTree():
 
 AnalysisTree::~AnalysisTree()
 {
-	for(int i = 0; i < _node.size(); ++i)
-	{
-		delete _node[i];
-	}
-	_node.clear();
+	releaseAnalysisTree();
 }
 
 void AnalysisTree::buildAnalysisTree()
 {
+	releaseAnalysisTree();
+
 	_node.push_back(new EthernetAnalysis());
 	_node.push_back(new ArpAnalysis());
 	_node.push_back(new IpAnalysis());
@@ -38,6 +36,15 @@ void AnalysisTree::buildAnalysisTree()
 	_node[IP]->addChild(_node[ICMP]);
 	_node[IP]->addChild(_node[TCP]);
 	_node[IP]->addChild(_node[UDP]);
+}
+
+void AnalysisTree::releaseAnalysisTree()
+{
+	for(int i = 0; i < _node.size(); ++i)
+	{
+		delete _node[i];
+	}
+	_node.clear();
 }
 
 void AnalysisTree::setProtocolFilter(const std::string &filter)

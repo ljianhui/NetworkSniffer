@@ -43,9 +43,12 @@ void ThreadGet::_getData()
     {
         char buffer[buf_size+1] = {0};
         int bytes = read(_read_fd, buffer, buf_size);
-        buffer[bytes] = 0;
-        QString txt = QString(QLatin1String(buffer));
-        emit sigGetData(txt);
+        if(bytes > 0)
+        {
+            buffer[bytes] = 0;
+            QString txt = QString(buffer);
+            emit sigGetData(txt);
+        }
     }
 }
 
