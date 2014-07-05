@@ -13,7 +13,7 @@ class Analysis
 		Analysis(const std::string &pname = "", int pcode = 0);
 		virtual ~Analysis();
 
-		void addChild(Analysis *child);
+		virtual void addChild(Analysis *child);
 		void setBuffer(const unsigned char *buffer, size_t bufsize);
 		
 		std::string getProtocolName()const;
@@ -35,7 +35,7 @@ class Analysis
 		size_t _bufsize;
 		std::string _protocol_name;
 
-		const unsigned short _pcode;
+		const unsigned short _pcode;//symbol the protocol
 
 	private:
 		std::list<Analysis*> _childern;

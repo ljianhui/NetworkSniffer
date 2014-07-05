@@ -22,6 +22,7 @@ RawSocket::~RawSocket()
 
 bool RawSocket::createSocket()
 {
+	//create the raw socket that catch all network packet
 	_sockfd = socket(PF_PACKET, SOCK_RAW, htons(ETH_P_ALL));
 	if(_sockfd == -1)
 		return false;
@@ -53,7 +54,8 @@ bool RawSocket::bindInterface(const char *interface)
 	_addr.sll_hatype = ARPHRD_ETHER;//set arp hardware type
 	_addr.sll_pkttype = PACKET_HOST;//set packet type
 	_addr.sll_halen = ETH_ALEN;//set mac addr length
-
+	
+	//bind the network interface
 	ret = bind(_sockfd, (struct sockaddr*)&_addr, sizeof(_addr));
 	if(ret == -1)
 		return false;
@@ -62,8 +64,10 @@ bool RawSocket::bindInterface(const char *interface)
 
 int RawSocket::recvPacket(unsigned char *buffer, size_t bufsize)
 {
+	//receive the packet, and write to the buffer
 	if(buffer == NULL)
 		return -1;
 	bzero(buffer, bufsize);
 	return recvfrom(_sockfd, buffer, bufsize, 0, NULL, NULL);
 }
+
